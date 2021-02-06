@@ -21,14 +21,15 @@ def timestamps_fx():
             datetime.datetime(2021, 1, 28, 00, 15),
             datetime.datetime(2021, 1, 28, 1, 0)]
 
+
+# pylint: disable=redefined-outer-name
+
 @pytest.fixture
 def datapoints_fx(timestamps_fx):
     """
     Return a list of datapoints for the timestamps from timestamp_fx
     """
     return [DataPoint(timestamp=ts, pulses=8) for ts in timestamps_fx]
-
-# pylint: disable=redefined-outer-name
 
 
 def test_one_element(datapoints_fx):
@@ -60,4 +61,25 @@ def test_dataset_ordering(datapoints_fx):
     input_order = [2, 4, 1, 0, 3]
     for index in input_order:
         dset.add(datapoints_fx[index])
+    assert list(dset) == datapoints_fx
+
+
+def test_update(datapoints_fx):
+    """
+    Test adding multiple data points to the set from a list or DataSet
+    """
+    dset1 = DataSet()
+    dset1.update(datapoints_fx)
+    assert list(dset1) == datapoints_fx
+
+    dset2 = DataSet()
+    dset2.update(dset1)
+    assert list(dset2) == datapoints_fx
+
+
+def test_init_with_data(datapoints_fx):
+    """
+    Test initializing DataSet with data
+    """
+    dset = DataSet(datapoints_fx)
     assert list(dset) == datapoints_fx
