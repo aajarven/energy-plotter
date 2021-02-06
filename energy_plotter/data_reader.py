@@ -7,6 +7,7 @@ import os
 
 
 from energy_plotter.datapoint import DataPoint
+from energy_plotter.dataset import DataSet
 
 
 class PulseReader():
@@ -33,10 +34,10 @@ class PulseReader():
 
         :data_day: datetime representation of the target day
         """
-        data = []
+        data = DataSet()
         with open(self._data_file(data_day), "r") as data_file:
             for line in data_file:
-                data.append(DataPoint.from_string(line))
+                data.add(DataPoint.from_string(line))
         return data
 
     def _data_file(self, data_day):
