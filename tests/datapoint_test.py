@@ -121,3 +121,26 @@ def test_illegal_datapoint_string():
         # pylint: disable=unused-variable
         datapoint = DataPoint.from_string("2021-01-30-23:43   ")  # noqa: F841
     assert "isn't a valid data entry" in str(err.value)
+
+
+def test_equality():
+    """
+    Test that equality of datapoints is based on their timestamps.
+    """
+    time1 = datetime.datetime(2020, 6, 8, 10, 11)
+    time2 = datetime.datetime(2020, 6, 8, 10, 12)
+
+    assert (DataPoint(timestamp=time1, pulses=3) ==
+            DataPoint(timestamp=time1, pulses=3))
+    assert (DataPoint(timestamp=time1, pulses=3) ==
+            DataPoint(timestamp=time1, pulses=40))
+    assert (DataPoint(timestamp=time1) ==
+            DataPoint(timestamp=time1))
+    assert (DataPoint(timestamp=time1) ==
+            DataPoint(timestamp=time1, pulses=3))
+    assert DataPoint() == DataPoint()
+    assert DataPoint(pulses=1) == DataPoint(pulses=2)
+
+    assert DataPoint() != time1
+    assert (DataPoint(timestamp=time1, pulses=3) !=
+            DataPoint(timestamp=time2, pulses=3))

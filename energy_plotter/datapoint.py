@@ -102,6 +102,14 @@ class DataPoint():
                              "".format(data_str, help_str))
         return cls(timestamp=parts[0], pulses=parts[1])
 
+    def __eq__(self, obj):
+        """
+        Two DataPoints are considered equal if they are for the same time.
+        """
+        if not isinstance(obj, self.__class__):
+            return False
+        return obj._timestamp == self._timestamp
+
 
 class NoValueForAttribute(Exception):
     """
