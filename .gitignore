@@ -1,4 +1,6 @@
 .venv
 *.sw?
 *.pyc
+.coverage
+
 data
