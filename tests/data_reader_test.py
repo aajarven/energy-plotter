@@ -6,7 +6,7 @@ import datetime
 
 import pytest
 
-from energy_plotter.data_reader import PulseReader
+from energy_plotter.data_reader import PulseReader, DataNotFound
 from energy_plotter.datapoint import DataPoint
 
 
@@ -48,3 +48,23 @@ def test_read_day(reader_fx):
     last_index = data.index(last_dp)
     assert last_index > 0
     assert data[last_index].pulses == last_dp.pulses
+
+
+def test_read_nonexistent_day(reader_fx):
+    """
+    Test that a DataNotFound error is raised when data file doesn't exist.
+    """
+    with pytest.raises(DataNotFound):
+        reader_fx.read_day(datetime.date(2020, 2, 1))
+
+
+def test_read_ambiguous_file(reader_fx):
+    """
+    Test that a ValueError is raised when ambiguous data is requested.
+
+    Such an error must be raised when there are more than one file for a date:
+    in this case a txt file and a csv.
+    """
+    with pytest.raises(ValueError) as err:
+        reader_fx.read_day(datetime.date(2020, 2, 5))
+    assert "More than one data file found for date" in str(err.value)
