@@ -22,6 +22,24 @@ class DataPoint():
         self.timestamp = timestamp
         self.pulses = pulses
 
+    @classmethod
+    def from_string(cls, data_str):
+        """
+        Return a new DataPoint based on a given data string.
+
+        The string mut contain a timestamp (YYYY-mm-dd-HH:mm, e.g.
+        "2021-01-29-23:43") and the number of pulses separated with
+        whitespace.
+        """
+        help_str = ("The string mut contain a timestamp (YYYY-mm-dd-HH:mm, "
+                    "e.g. '2021-01-29-23:43') and the number of pulses "
+                    "separated with whitespace.")
+        parts = data_str.split()
+        if len(parts) != 2:
+            raise ValueError("String '{}' isn't a valid data entry. {}"
+                             "".format(data_str, help_str))
+        return cls(timestamp=parts[0], pulses=parts[1])
+
     @property
     def timestamp(self):
         """
@@ -84,24 +102,6 @@ class DataPoint():
 
         self._pulses = pulses
 
-    @classmethod
-    def from_string(cls, data_str):
-        """
-        Return a new DataPoint based on a given data string.
-
-        The string mut contain a timestamp (YYYY-mm-dd-HH:mm, e.g.
-        "2021-01-29-23:43") and the number of pulses separated with
-        whitespace.
-        """
-        help_str = ("The string mut contain a timestamp (YYYY-mm-dd-HH:mm, "
-                    "e.g. '2021-01-29-23:43') and the number of pulses "
-                    "separated with whitespace.")
-        parts = data_str.split()
-        if len(parts) != 2:
-            raise ValueError("String '{}' isn't a valid data entry. {}"
-                             "".format(data_str, help_str))
-        return cls(timestamp=parts[0], pulses=parts[1])
-
     def __eq__(self, obj):
         """
         Two DataPoints are considered equal if they are for the same time.
@@ -110,10 +110,39 @@ class DataPoint():
             return False
         return obj._timestamp == self._timestamp
 
+    def __gt__(self, obj):
+        if not isinstance(obj, self.__class__):
+            raise TypeError("Trying to compare incompatible classes {} and {}"
+                            "".format(type(self).__name__, type(obj).__name__))
+        if self._timestamp is None or obj._timestamp is None:
+            raise NoValueForAttribute("Cannot compare DataPoints without"
+                                      "timestamps")
+        return self._timestamp > obj._timestamp
+
+    def __lt__(self, obj):
+        if not isinstance(obj, self.__class__):
+            raise TypeError("Trying to compare incompatible classes {} and {}"
+                            "".format(type(self).__name__, type(obj).__name__))
+        if self._timestamp is None or obj._timestamp is None:
+            raise NoValueForAttribute("Cannot compare DataPoints without"
+                                      "timestamps")
+        return self._timestamp < obj._timestamp
+
+    def __le__(self, obj):
+        return self == obj or self < obj
+
+    def __ge__(self, obj):
+        return self == obj or self > obj
+
+    def __hash__(self):
+        if self._timestamp is None:
+            return 0
+        return hash(self._timestamp)
+
 
 class NoValueForAttribute(Exception):
     """
-    Exception for situations when a value is not found for attribute,
+    Exception for situations when a value is not found for attribute
     """
 
 
