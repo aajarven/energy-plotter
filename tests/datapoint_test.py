@@ -6,6 +6,7 @@ import datetime
 
 import pytest
 
+import conf
 from energy_plotter.datapoint import (DataPoint, NoValueForAttribute,
                                       ImmutableMutationError)
 
@@ -16,6 +17,14 @@ def test_datapoint_pulses():
     """
     datapoint = DataPoint(pulses=9)
     assert datapoint.pulses == 9
+
+
+def test_datapoint_zero_pulses():
+    """
+    Ensure that datapoint with zero pulses works.
+    """
+    datapoint = DataPoint(pulses=0)
+    assert datapoint.pulses == 0
 
 
 def test_datapoint_timestamp():
@@ -202,3 +211,19 @@ def test_datapoint_hash():
     timestamp = datetime.datetime(2020, 6, 8, 10, 11)
     assert hash(DataPoint(timestamp=timestamp, pulses=1)) == hash(timestamp)
     assert hash(DataPoint(pulses=100)) == 0
+
+
+def test_datapoint_kwh():
+    dp = DataPoint(pulses=123)
+    assert dp.kwh == 123 * conf.KWH_PER_PULSE
+    dp = DataPoint(pulses=0)
+    assert dp.kwh == 0
+
+
+def test_datapoint_kwh_pulses_not_set():
+    """
+    NoValueForAttribute must be raised when pulses have not been set.
+    """
+    datapoint = DataPoint()
+    with pytest.raises(NoValueForAttribute):
+        datapoint.kwh  # pylint: disable=pointless-statement

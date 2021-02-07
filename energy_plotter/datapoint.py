@@ -4,6 +4,8 @@ Representation of one point of pulse count data.
 
 import datetime
 
+from conf import KWH_PER_PULSE
+
 
 class DataPoint():
     """
@@ -80,7 +82,7 @@ class DataPoint():
         """
         Number of pulses.
         """
-        if not self._pulses:
+        if self._pulses is None:
             raise NoValueForAttribute("Pulse count number not set")
         return self._pulses
 
@@ -101,6 +103,15 @@ class DataPoint():
             raise ValueError("Pulse count cannot be negative")
 
         self._pulses = pulses
+
+    @property
+    def kwh(self):
+        """
+        Return the number of kWh this data point represents.
+        """
+        if self._pulses is None:
+            raise NoValueForAttribute("Pulse count number not set")
+        return self._pulses * KWH_PER_PULSE
 
     def __eq__(self, obj):
         """

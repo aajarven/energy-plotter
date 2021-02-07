@@ -6,6 +6,7 @@ import datetime
 
 import pytest
 
+import conf
 from energy_plotter.datapoint import DataPoint
 from energy_plotter.dataset import DataSet
 
@@ -22,14 +23,23 @@ def timestamps_fx():
             datetime.datetime(2021, 1, 28, 1, 0)]
 
 
+@pytest.fixture
+def pulses_fx():
+    """
+    Return a list of file pulse counts.
+    """
+    return [65, 9438, 0, 432, 9]
+
+
 # pylint: disable=redefined-outer-name
 
 @pytest.fixture
-def datapoints_fx(timestamps_fx):
+def datapoints_fx(timestamps_fx, pulses_fx):
     """
     Return a list of datapoints for the timestamps from timestamp_fx
     """
-    return [DataPoint(timestamp=ts, pulses=8) for ts in timestamps_fx]
+    return [DataPoint(timestamp=ts, pulses=p)
+            for (ts, p) in zip(timestamps_fx, pulses_fx)]
 
 
 def test_one_element(datapoints_fx):
@@ -83,3 +93,33 @@ def test_init_with_data(datapoints_fx):
     """
     dset = DataSet(datapoints_fx)
     assert list(dset) == datapoints_fx
+
+
+def test_dataset_timestamps(datapoints_fx, timestamps_fx):
+    """
+    Test the timestamps property.
+    """
+    dset = DataSet()
+    assert dset.timestamps == []
+    dset.update(datapoints_fx)
+    assert dset.timestamps == timestamps_fx
+
+
+def test_dataset_pulses(datapoints_fx, pulses_fx):
+    """
+    Test the pulses property.
+    """
+    dset = DataSet()
+    assert dset.pulses == []
+    dset.update(datapoints_fx)
+    assert dset.pulses == pulses_fx
+
+
+def test_dataset_kwhs(datapoints_fx, pulses_fx):
+    """
+    Test the kwhs property
+    """
+    dset = DataSet()
+    assert dset.kwhs == []
+    dset.update(datapoints_fx)
+    assert dset.kwhs == [p * conf.KWH_PER_PULSE for p in pulses_fx]
