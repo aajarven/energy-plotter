@@ -144,3 +144,61 @@ def test_equality():
     assert DataPoint() != time1
     assert (DataPoint(timestamp=time1, pulses=3) !=
             DataPoint(timestamp=time2, pulses=3))
+
+
+def test_datapoint_comparison():
+    """
+    Ensure that data points are compared based on their timestamps.
+    """
+    time1 = datetime.datetime(2020, 6, 8, 10, 11)
+    time2 = datetime.datetime(2020, 6, 8, 10, 12)
+    time3 = datetime.datetime(2021, 6, 8, 10, 12)
+
+    dp1 = DataPoint(timestamp=time1, pulses=10)
+    dp2 = DataPoint(timestamp=time2, pulses=2)
+    dp3 = DataPoint(timestamp=time3, pulses=12)
+    dp4 = DataPoint(timestamp=time3, pulses=13)
+
+    assert dp1 < dp2
+    assert dp2 < dp3
+    assert dp3 > dp2
+    assert dp2 > dp1
+
+    assert dp4 <= dp3
+    assert dp1 <= dp4
+    assert dp4 >= dp3
+    assert dp4 >= dp1
+
+    with pytest.raises(TypeError):
+        dp1 > time2  # pylint: disable=pointless-statement
+
+    with pytest.raises(TypeError):
+        dp1 < time2  # pylint: disable=pointless-statement
+
+
+def test_datapoint_comparison_no_timestamp():
+    """
+    Check that an error is raised if DataPoints without timestamps are compared
+    """
+    timestamp = datetime.datetime(2020, 6, 8, 10, 11)
+    dp_time = DataPoint(timestamp=timestamp, pulses=10)
+    dp_notime = DataPoint(pulses=10)
+
+    # pylint: disable=pointless-statement
+    with pytest.raises(NoValueForAttribute):
+        dp_time > dp_notime
+    with pytest.raises(NoValueForAttribute):
+        dp_time < dp_notime
+    with pytest.raises(NoValueForAttribute):
+        dp_notime < dp_time
+    with pytest.raises(NoValueForAttribute):
+        dp_notime > dp_time
+
+
+def test_datapoint_hash():
+    """
+    Ensure that datapoints are hashed based on their timestamps
+    """
+    timestamp = datetime.datetime(2020, 6, 8, 10, 11)
+    assert hash(DataPoint(timestamp=timestamp, pulses=1)) == hash(timestamp)
+    assert hash(DataPoint(pulses=100)) == 0
