@@ -36,3 +36,10 @@ class DataSet(SortedSet):   # pylint: disable=too-many-ancestors
         Return a list of all the pulse counts in the dataset.
         """
         return [dp.pulses for dp in self]
+
+    @property
+    def kwhs(self):
+        """
+        Return a list of kwh measurements in the dataset.
+        """
+        return [dp.kwh for dp in self]

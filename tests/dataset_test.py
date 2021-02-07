@@ -6,6 +6,7 @@ import datetime
 
 import pytest
 
+import conf
 from energy_plotter.datapoint import DataPoint
 from energy_plotter.dataset import DataSet
 
@@ -112,3 +113,13 @@ def test_dataset_pulses(datapoints_fx, pulses_fx):
     assert dset.pulses == []
     dset.update(datapoints_fx)
     assert dset.pulses == pulses_fx
+
+
+def test_dataset_kwhs(datapoints_fx, pulses_fx):
+    """
+    Test the kwhs property
+    """
+    dset = DataSet()
+    assert dset.kwhs == []
+    dset.update(datapoints_fx)
+    assert dset.kwhs == [p * conf.KWH_PER_PULSE for p in pulses_fx]
