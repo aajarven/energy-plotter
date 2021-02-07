@@ -18,6 +18,14 @@ def test_datapoint_pulses():
     assert datapoint.pulses == 9
 
 
+def test_datapoint_zero_pulses():
+    """
+    Ensure that datapoint with zero pulses works.
+    """
+    datapoint = DataPoint(pulses=0)
+    assert datapoint.pulses == 0
+
+
 def test_datapoint_timestamp():
     """
     Test creating a data point with set timestamp.

@@ -80,7 +80,7 @@ class DataPoint():
         """
         Number of pulses.
         """
-        if not self._pulses:
+        if self._pulses is None:
             raise NoValueForAttribute("Pulse count number not set")
         return self._pulses
 
