@@ -2,6 +2,7 @@
 Tools for reading input data.
 """
 
+import datetime
 import glob
 import os
 
@@ -38,6 +39,25 @@ class PulseReader():
         with open(self._data_file(data_day), "r") as data_file:
             for line in data_file:
                 data.add(DataPoint.from_string(line))
+        return data
+
+    def read_interval(self, start, end):
+        """
+        Return data betwee given start and end timestamps.
+
+        :start: datetime of the earliest included data point
+        :end: datetime of the latest included data point
+        """
+
+        data = DataSet()
+        day_to_be_read = start.date()
+        while day_to_be_read <= end.date():
+            with open(self._data_file(day_to_be_read), "r") as data_file:
+                for line in data_file:
+                    dp = DataPoint.from_string(line)
+                    if dp.timestamp >= start and dp.timestamp <= end:
+                        data.add(dp)
+            day_to_be_read = day_to_be_read + datetime.timedelta(days=1)
         return data
 
     def _data_file(self, data_day):

@@ -68,3 +68,24 @@ def test_read_ambiguous_file(reader_fx):
     with pytest.raises(ValueError) as err:
         reader_fx.read_day(datetime.date(2020, 2, 5))
     assert "More than one data file found for date" in str(err.value)
+
+
+def test_read_multiple_days(reader_fx):
+    """
+    Test that read_day returns correct number of data points from the file and
+    has read the first and last data point correctly.
+    """
+    start = datetime.datetime(2021, 2, 4, 13, 25)
+    end = datetime.datetime(2021, 2, 5, 2, 0)
+    data = reader_fx.read_interval(start, end)
+    assert len(data) == 756
+
+    first_dp = DataPoint(timestamp=start, pulses=1256)
+    last_dp = DataPoint(timestamp=end, pulses=1990)
+
+    assert data.index(first_dp) == 0
+    assert data[0].pulses == first_dp.pulses
+
+    last_index = data.index(last_dp)
+    assert last_index > 0
+    assert data[last_index].pulses == last_dp.pulses
